@@ -62,10 +62,7 @@ export default class ProvinceRepository{
             const client = new Client(config);
             await client.connect();
             const sql = `
-                UPDATE provinces
-                    (name, full_name, latitute, longitude, display_order)
-                VALUES
-                    ($1, $2, $3, $4, $5)
+                
             `;
             const values = [entity.name, entity.full_name, entity.latitude, entity.longitude, entity.display_order];
             const result = await client.query(sql, values);
