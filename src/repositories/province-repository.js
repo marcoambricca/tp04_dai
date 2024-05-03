@@ -1,8 +1,6 @@
 import DBConfig from './../configs/db-config.js';
 import pkg from 'pg';
-import res from 'express/lib/response.js';
-import { rows } from 'pg/lib/defaults.js';
-const { Client, Pool } = pkg;
+const { Client } = pkg;
 
 export default class ProvinceRepository{
     getAllSync = async () => {
@@ -23,22 +21,24 @@ export default class ProvinceRepository{
     
     getByIdSync = async (id) => {
         let returnObject = null;
+        const client = new Client(DBConfig);
         try {
-            const client = await this.getDBClient();
+            await client.connect();
             const sql = 'SELECT * from provinces WHERE id=$1';
             const values = [id];
             const result = await client.query(sql, values);
+            await client.end();
             returnObject = result.rows[0];
         }
         catch (error){
-            console.logError(error);
+            console.log(error);
         }
         return returnObject;
     }
     createAsync = async (entity) => {
         let rowsAffected = 0;
+        const client = new Client(DBConfig);
         try {
-            const client = new Client(config);
             await client.connect();
             const sql = `
                 INSERT INTO provinces
@@ -48,43 +48,49 @@ export default class ProvinceRepository{
             `;
             const values = [entity.name, entity.full_name, entity.latitude, entity.longitude, entity.display_order];
             const result = await client.query(sql, values);
+            await client.end();
             rowsAffected = result.rowCount;
         }
         catch (error){
-            console.logError(error);
+            console.log(error);
         }
         await client.end();
         return rowsAffected;
     }
     updateAsync = async (entity) => {
         let rowsAffected = 0;
+        const client = new Client(DBConfig);
         try {
-            const client = new Client(config);
             await client.connect();
             const sql = `
-                
+                UPDATE provinces
+                SET name = $1, full_name = $2, latitude = $3, longitude = $4, display_order = $5
+                WHERE id = $6
             `;
-            const values = [entity.name, entity.full_name, entity.latitude, entity.longitude, entity.display_order];
+            const values = [entity.name, entity.full_name, entity.latitude, entity.longitude, entity.display_order, entity.id];
             const result = await client.query(sql, values);
+            await client.end();
             rowsAffected = result.rowCount;
         }
         catch (error){
-            console.logError(error);
+            console.log(error);
         }
         await client.end();
         return rowsAffected;
     }
     deleteByIdAsync = async (id) => {
         let rowsAffected = 0;
+        const client = new Client(DBConfig);
         try {
-            const client = await this.getDBClient();
+            await client.connect();
             const sql = 'DELETE from provinces WHERE id=$1';
             const values = [id];
             const result = await client.query(sql, values);
+            await client.end();
             rowsAffected = result.rowCount;
         }
         catch (error){
-            console.logError(error);
+            console.log(error);
         }
         return rowsAffected;
     }
