@@ -30,7 +30,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('', async (req, res) => {
     let respuesta;
-    const provincia = new Province(req.body.name, req.body.full_name, req.body.latitude, req.body.longitude, req.body.display_order);
+    const provincia = req.body;
     const response = await svc.createAsync(provincia);
     if (response == 1){
         respuesta = res.status(201).send("Objeto creado.");
@@ -45,11 +45,34 @@ router.post('', async (req, res) => {
 })
 
 router.put('', async (req, res) => {
-    
+    let respuesta;
+    const provincia = req.body;
+    const response = await svc.updateAsync(provincia);
+    if (response == 1){
+        respuesta = res.status(201).send("Objeto actualizado.");
+    }
+    else if (response > 1){
+        respuesta = res.status(400).send("Mas de un objeto actualizado.");
+    }
+    else if (response < 1){
+        respuesta = res.status(404).send("No se encontro el objeto.");
+    }
+    return respuesta;
 })
 
 router.delete('/:id', async (req, res) => {
-    
+    let respuesta;
+    const response = await svc.deleteByIdAsync(req.params.id);
+    if (response[0] == 1 && response[1] > 0){
+        respuesta = res.status(200).send("Objeto borrado.");
+    }
+    else if (response[0] > 1){
+        respuesta = res.status(400).send("Mas de un objeto borrado.");
+    }
+    else if (response[0] < 1 || response[1] < 1){
+        respuesta = res.status(404).send("No se ha borrado el objeto.");
+    }
+    return respuesta;
 })
 
 export default router;

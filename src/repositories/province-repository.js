@@ -42,7 +42,7 @@ export default class ProvinceRepository{
             await client.connect();
             const sql = `
                 INSERT INTO provinces
-                    (name, full_name, latitute, longitude, display_order)
+                    (name, full_name, latitude, longitude, display_order)
                 VALUES
                     ($1, $2, $3, $4, $5)
             `;
@@ -79,15 +79,24 @@ export default class ProvinceRepository{
         return rowsAffected;
     }
     deleteByIdAsync = async (id) => {
-        let rowsAffected = 0;
+        let rowsAffected = false;
         const client = new Client(DBConfig);
         try {
             await client.connect();
-            const sql = 'DELETE from provinces WHERE id=$1';
+            const locationsSql = 'SELECT id FROM locations where id_province = $1';
             const values = [id];
-            const result = await client.query(sql, values);
+            const locationResult = await client.query(locationsSql, values);
+            for (const locationRow of locationResult.rows){
+                const locationId = locationRow.id;
+                const deleteLocationQuery = `DELETE FROM locations WHERE id = $1`;
+                const deleteLocationValues = [locationId];
+                await client.query(deleteLocationQuery, deleteLocationValues);
+            }
+            const deleteSql = 'DELETE FROM provinces WHERE id = $1';
+            const deleteValues = [id];
+            const deleteResult = await client.query(deleteSql, deleteValues);
             await client.end();
-            rowsAffected = result.rowCount;
+            rowsAffected = true;
         }
         catch (error){
             console.log(error);
