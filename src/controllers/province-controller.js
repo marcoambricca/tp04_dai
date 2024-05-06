@@ -63,13 +63,13 @@ router.put('', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     let respuesta;
     const response = await svc.deleteByIdAsync(req.params.id);
-    if (response[0] == 1 && response[1] > 0){
+    if (response == 1){
         respuesta = res.status(200).send("Objeto borrado.");
     }
-    else if (response[0] > 1){
+    else if (response > 1){
         respuesta = res.status(400).send("Mas de un objeto borrado.");
     }
-    else if (response[0] < 1 || response[1] < 1){
+    else if (response < 1){
         respuesta = res.status(404).send("No se ha borrado el objeto.");
     }
     return respuesta;

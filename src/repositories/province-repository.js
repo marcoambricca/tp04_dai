@@ -79,7 +79,7 @@ export default class ProvinceRepository{
         return rowsAffected;
     }
     deleteByIdAsync = async (id) => {
-        let rowsAffected = false;
+        let rowsAffected = 0;
         const client = new Client(DBConfig);
         try {
             await client.connect();
@@ -96,7 +96,7 @@ export default class ProvinceRepository{
             const deleteValues = [id];
             const deleteResult = await client.query(deleteSql, deleteValues);
             await client.end();
-            rowsAffected = true;
+            rowsAffected = deleteResult.rowCount;
         }
         catch (error){
             console.log(error);
